@@ -1,0 +1,158 @@
+# ═══════════════════════════════════════════════════════════════
+# Example Schema for ERC20 Token Subgraph
+# ═══════════════════════════════════════════════════════════════
+
+# Token entity - one per token contract
+type Token @entity {
+  id: ID!                              # Contract address
+  address: Bytes!                       # Contract address
+  name: String!                         # Token name
+  symbol: String!                       # Token symbol
+  decimals: Int!                        # Token decimals
+  totalSupply: BigInt!                  # Current total supply
+
+  # Aggregated statistics
+  transferCount: BigInt!                # Total number of transfers
+  holderCount: BigInt!                  # Number of unique holders
+
+  # Relations
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+  users: [User!]! @derivedFrom(field: "token")
+
+  # Metadata
+  createdAtTimestamp: BigInt!           # First seen timestamp
+  createdAtBlock: BigInt!               # First seen block
+}
+
+# Transfer event
+type Transfer @entity {
+  id: ID!                               # tx hash + log index
+  token: Token!                         # Token being transferred
+  from: User!                           # Sender
+  to: User!                             # Recipient
+  value: BigInt!                        # Amount transferred
+
+  # Transaction details
+  transactionHash: Bytes!               # Transaction hash
+  blockNumber: BigInt!                  # Block number
+  timestamp: BigInt!                    # Block timestamp
+  gasPrice: BigInt!                     # Gas price used
+}
+
+# User (wallet) entity
+type User @entity {
+  id: ID!                               # User address + token address
+  token: Token!                         # Token contract
+  address: Bytes!                       # User wallet address
+  balance: BigInt!                      # Current balance
+
+  # Activity statistics
+  totalSent: BigInt!                    # Total amount sent
+  totalReceived: BigInt!                # Total amount received
+  transfersSentCount: BigInt!           # Number of sends
+  transfersReceivedCount: BigInt!       # Number of receives
+
+  # Relations
+  transfersSent: [Transfer!]! @derivedFrom(field: "from")
+  transfersReceived: [Transfer!]! @derivedFrom(field: "to")
+  approvals: [Approval!]! @derivedFrom(field: "owner")
+
+  # Metadata
+  firstSeenTimestamp: BigInt!           # First interaction timestamp
+  lastSeenTimestamp: BigInt!            # Last interaction timestamp
+  firstSeenBlock: BigInt!               # First interaction block
+  lastSeenBlock: BigInt!                # Last interaction block
+}
+
+# Approval event
+type Approval @entity {
+  id: ID!                               # tx hash + log index
+  token: Token!                         # Token contract
+  owner: User!                          # Token owner
+  spender: Bytes!                       # Approved spender
+  value: BigInt!                        # Approved amount
+
+  # Transaction details
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+# Daily transfer statistics
+type DailyTransferCount @entity {
+  id: ID!                               # timestamp / 86400 (day)
+  token: Token!                         # Token contract
+  date: Int!                            # Unix timestamp (day start)
+  count: BigInt!                        # Number of transfers
+  volume: BigInt!                       # Total volume transferred
+  uniqueSenders: BigInt!                # Unique senders
+  uniqueReceivers: BigInt!              # Unique receivers
+}
+
+# Hourly transfer statistics
+type HourlyTransferCount @entity {
+  id: ID!                               # timestamp / 3600 (hour)
+  token: Token!                         # Token contract
+  timestamp: Int!                       # Unix timestamp (hour start)
+  count: BigInt!                        # Number of transfers
+  volume: BigInt!                       # Total volume transferred
+}
+
+# Global statistics (singleton entity)
+type GlobalStats @entity {
+  id: ID!                               # Always "1"
+  totalTokens: BigInt!                  # Number of tokens indexed
+  totalTransfers: BigInt!               # Total transfers across all tokens
+  totalUsers: BigInt!                   # Total unique users
+  lastUpdateTimestamp: BigInt!          # Last update time
+  lastUpdateBlock: BigInt!              # Last update block
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Advanced Features
+# ═══════════════════════════════════════════════════════════════
+
+# Full-text search example
+type SearchableUser @entity {
+  id: ID!
+  name: String! @fulltext(name: "userSearch", fields: ["name", "bio"])
+  bio: String!
+  address: Bytes!
+}
+
+# Time-series data for charting
+type TokenSnapshot @entity {
+  id: ID!                               # token address + timestamp
+  token: Token!
+  timestamp: Int!
+  totalSupply: BigInt!
+  holderCount: BigInt!
+  transferCount: BigInt!
+}
+
+# Large holder tracking
+type LargeHolder @entity {
+  id: ID!                               # user address + token address
+  user: User!
+  token: Token!
+  balance: BigInt!
+  percentageOfSupply: BigDecimal!       # Balance / total supply * 100
+  isWhale: Boolean!                     # Balance > 1% of supply
+  rank: Int!                            # Rank by balance
+}
+
+# Transaction metadata for analytics
+type Transaction @entity {
+  id: ID!                               # Transaction hash
+  hash: Bytes!
+  from: Bytes!
+  to: Bytes
+  value: BigInt!
+  gasPrice: BigInt!
+  gasUsed: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+
+  # Relations
+  transfers: [Transfer!]! @derivedFrom(field: "transactionHash")
+}

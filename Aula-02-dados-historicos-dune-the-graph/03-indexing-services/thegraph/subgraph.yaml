@@ -1,0 +1,96 @@
+specVersion: 0.0.5
+description: Example ERC20 Token Subgraph
+repository: https://github.com/your-username/token-subgraph
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  # Example: Index USDC token
+  - kind: ethereum
+    name: USDC
+    network: mainnet
+    source:
+      address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      abi: ERC20
+      startBlock: 6082465  # USDC deployment block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Transfer
+        - User
+        - TransferCount
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+      blockHandlers:
+        # Optional: Track statistics per block
+        - handler: handleBlock
+          filter:
+            kind: call
+      file: ./mappings/token.ts
+
+  # Example: Index multiple tokens (USDT)
+  - kind: ethereum
+    name: USDT
+    network: mainnet
+    source:
+      address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      abi: ERC20
+      startBlock: 4634748  # USDT deployment block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Transfer
+        - User
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+      file: ./mappings/token.ts
+
+# Optional: Templates for dynamic contract creation
+# Useful for factory patterns (e.g., Uniswap pairs)
+templates:
+  - kind: ethereum/contract
+    name: ERC20Token
+    network: mainnet
+    source:
+      abi: ERC20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./mappings/token.ts
+      entities:
+        - Token
+        - Transfer
+        - User
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+
+# Features (optional)
+features:
+  - grafting        # Continue from existing subgraph
+  - ipfsOnEthereumContracts  # Support IPFS
+  - nonFatalErrors  # Continue indexing on non-fatal errors

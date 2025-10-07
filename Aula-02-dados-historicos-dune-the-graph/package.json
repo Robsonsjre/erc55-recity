@@ -1,0 +1,44 @@
+{
+  "name": "evm-historical-data-workshop",
+  "version": "1.0.0",
+  "description": "Educational workshop on querying historical data from EVM blockchains",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example:basic-filter": "node 01-event-filters/basic-filter.js",
+    "example:advanced-filter": "node 01-event-filters/advanced-filter.js",
+    "example:simulate": "node 02-transaction-simulation/simulate-past-state.js",
+    "example:tenderly": "node 02-transaction-simulation/tenderly-example.js",
+    "example:hardhat-fork": "node 02-transaction-simulation/hardhat-fork.js",
+    "example:dune-api": "node 03-indexing-services/dune/api-integration.js",
+    "example:graph-query": "node 03-indexing-services/thegraph/query-examples.js"
+  },
+  "keywords": [
+    "ethereum",
+    "blockchain",
+    "web3",
+    "evm",
+    "historical-data",
+    "dune-analytics",
+    "the-graph",
+    "event-filters",
+    "eth_call",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^5.7.2",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@graphprotocol/graph-cli": "^0.56.0",
+    "@graphprotocol/graph-ts": "^0.31.0",
+    "hardhat": "^2.19.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
