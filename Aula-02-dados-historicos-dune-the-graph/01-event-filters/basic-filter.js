@@ -20,7 +20,7 @@ async function basicFilterExample() {
   console.log(`Current block: ${currentBlock}\n`)
 
   // Query the last 1000 blocks for Transfer events
-  const fromBlock = currentBlock - 1000
+  const fromBlock = currentBlock - 2
   const toBlock = currentBlock
 
   console.log(`Querying USDC Transfer events from block ${fromBlock} to ${toBlock}...\n`)
@@ -67,7 +67,7 @@ async function filterByAddress() {
   const VITALIK = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
 
   const currentBlock = await provider.getBlockNumber()
-  const fromBlock = currentBlock - 5000
+  const fromBlock = currentBlock - 5
 
   console.log(`Looking for USDC transfers TO Vitalik's address in last 5000 blocks...\n`)
 
