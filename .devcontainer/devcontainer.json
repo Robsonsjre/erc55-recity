@@ -1,0 +1,55 @@
+{
+  "name": "Course Env (Rust + friends)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+
+  // One-line installers maintained by the Dev Containers project
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "latest",
+      "profile": "minimal",
+      "targets": "wasm32-unknown-unknown"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
+  },
+
+  // OS packages your students might need for common crates/builds
+  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y build-essential pkg-config libssl-dev",
+
+  // Language tooling & cargo utilities
+  "postCreateCommand": "bash -lc 'rustup component add clippy rustfmt && cargo install cargo-watch wasm-pack'",
+
+  // VS Code tweaks inside the codespace
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "matklad.rust-analyzer",        // fallback for some students
+        "serayuzgur.crates",
+        "tamasfe.even-better-toml",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "rust-analyzer.cargo.allFeatures": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  // Helpful for running web servers, etc.
+  "forwardPorts": [5173, 8000],
+  "portsAttributes": {
+    "5173": { "label": "Vite Dev Server" },
+    "8000": { "label": "App" }
+  },
+
+  // Resource hints for smoother workshops
+  "hostRequirements": { "cpus": 4, "memory": "8gb", "storage": "32gb" },
+
+  // Run as the unprivileged default user
+  "remoteUser": "vscode"
+}
